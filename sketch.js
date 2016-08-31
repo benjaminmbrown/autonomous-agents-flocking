@@ -5,37 +5,39 @@ var debug = true;
 var flowfield;
 var vehicles = [];
 var path;
-var slider1,slider2,slider3;
+var flock;
+var slider1, slider2, slider3, slider4;
 
 
 function setup() {
 
     createCanvas(820, 460);
     setFrameRate(60);
+    flock = new Flock();
     flowfield = new Flowfield(20);
     //path = new Path(width, height);
     //newPath();
 
+
+
     slider1 = createSlider(0, 8, 4);
     slider2 = createSlider(0, 8, 4);
-    slider3 = createSlider(10, 160, 24);
+    slider3 = createSlider(0, 8, 4);
+    slider4 = createSlider(10, 160, 24);
 }
 
 function draw() {
     background(255);
-    //path.display()
-    var mouse = createVector(mouseX, mouseY);
-    for (var i = 0; i < vehicles.length; i++) {
 
-        vehicles[i].manageBehaviors(vehicles);
-        vehicles[i].run();
-    }
+    var mouse = createVector(mouseX, mouseY);
+
+    flock.run();
 }
 
 function keyPressed() {
 
     for (var i = 0; i < key; i++) {
-        vehicles.push(new Vehicle(random(width), random(height), random(2, 3), random(0.02, 0.02), width, height));
+         flock.addVehicle(new Vehicle(random(width), random(height), random(2, 3), random(0.02, 0.02), width, height));
     }
     if (key == 'K') {
         console.log("pressed");
@@ -48,9 +50,12 @@ function keyPressed() {
 function mousePressed() {
     flowfield.init();
     // path.init();
-   // newPath();
+    // newPath();
 }
 
+// function mouseDragged(){
+//     flock.addVehicle(new Vehicle(mouseX,mouseY));
+// }
 function newPath() {
     path = new Path();
     path.addPoint(-20, height / 2);
