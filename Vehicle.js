@@ -17,8 +17,8 @@ var Vehicle = function(x, y) {
 
 
 
-    this.cohesionDistance = 100;
-    this.desiredSeparation = 25;
+    this.cohesionDistance = 200;
+    this.desiredSeparation = 45;
     this.alignDistance = 100;
 
     this.visionDepth = 80
@@ -45,14 +45,14 @@ console.log(this.visionDepth);
         sep.mult(1.5);
         ali.mult(1.0);
         coh.mult(1.2);
-        seekForce.mult(0.5);
+        seekForce.mult(0.1);
 
         // Add the force vectors to acceleration
          this.applyForce(ali);
          this.applyForce(coh);
         this.applyForce(sep);
         
-        //  this.applyForce(seekForce);
+          this.applyForce(seekForce);
 
     }
 

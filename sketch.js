@@ -4,7 +4,7 @@ var debug ;
 
 function setup() {
 
-    createCanvas(820, 460);
+    createCanvas(1020, 680);
     setFrameRate(50);
     flock = new Flock();
 

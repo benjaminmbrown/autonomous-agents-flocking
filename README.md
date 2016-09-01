@@ -1,7 +1,7 @@
 # autonomous-agents-flocking
 Flocking with autonomous agents.
 #nebulous object with alpha and flocking
-<img src="http://www.giphy.com/gifs/26gJArv5fZdqtEh6U"/>
+<img src="https://media.giphy.com/media/26gJArv5fZdqtEh6U/giphy.gif"/>
 #improving cohesion and separation
 <img src="https://media.giphy.com/media/3oz8xvshs2odTEl96M/giphy.gif"/>
 #flocking with more focused 'cone' of vision 
