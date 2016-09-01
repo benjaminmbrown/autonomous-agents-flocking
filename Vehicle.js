@@ -4,7 +4,7 @@ var Vehicle = function(x, y) {
     this.velocity = createVector(random(-1, 1), random(-1, 1));
     this.position = createVector(x, y);
     this.r = 3;
-    this.maxSpeed = 3;
+    this.maxSpeed = 5;
     this.maxForce = 0.02;
     this.mass = 155;
 
@@ -14,6 +14,9 @@ var Vehicle = function(x, y) {
     this.wanderAngle = 0;
     this.wanderForce = createVector();
     this.separationRadius = 40;
+    this.visionDepth = random(20,100);
+    this.visionDegrees = random(10,160);//width of cone of vision
+
 
     var c = color(0, 0, random(x, y));
 
@@ -71,7 +74,7 @@ var Vehicle = function(x, y) {
 
         for (var i = 0; i < vehicles.length; i++) {
             var distance = p5.Vector.dist(this.position, vehicles[i].position);
-            if ((distance > 10) && (distance < neighborDistance)&& (this.isTargetVisible(vehicles[i]))) {
+            if ((distance > 10) && (distance < neighborDistance)) {
                 sum.add(vehicles[i].position);
                 count++;
             }
@@ -90,10 +93,11 @@ var Vehicle = function(x, y) {
         //takes the position of this, and builds a cone of vision
         //returns true if target is in cone of vision
         //false if otherwise.
-
+      //   var distance = p5.Vector.dist(this.position, target.position);
          var angle = p5.Vector.angleBetween(this.velocity, target.velocity);
          
-         if(degrees(angle)>10){
+         if((degrees(angle)>45)){
+           // console.log("in vision", this.visionDegrees, this.visionDepth)
             return true
          }else {
             return false;
@@ -105,14 +109,12 @@ var Vehicle = function(x, y) {
         var visionRadius = 30;
         var sum = createVector(0, 0);
         var count = 0;
-        var visionDepth = 100 // how far ahed to look
-        var visionDegrees = 45 //degrees of vision
 
 
         for (var i = 0; i < vehicles.length; i++) {
             var distance = p5.Vector.dist(this.position, vehicles[i].position);
 
-            if ((distance > 5) && (distance < visionRadius) && (this.isTargetVisible(vehicles[i]))) {
+            if ((distance > 0) && (this.isTargetVisible(vehicles[i]))) {
                 sum.add(vehicles[i].velocity);
                 count++;
             }
@@ -138,14 +140,14 @@ var Vehicle = function(x, y) {
     }
 
     this.separate = function(vehicles) {
-        var desiredSeparation = 55.0;
+        var desiredSeparation = 35.0;
         var count = 0;
         var steer = createVector(0, 0);
 
         for (var i = 0; i < vehicles.length; i++) {
             var distance = p5.Vector.dist(this.position, vehicles[i].position);
 
-            if ((distance > 0) && (distance < desiredSeparation)&& (this.isTargetVisible(vehicles[i]))) {
+            if ((distance > 0) && (distance < desiredSeparation)) {
                 //vector pointing away from neighbor
                 var diff = p5.Vector.sub(this.position, vehicles[i].position);
                 diff.normalize();
@@ -382,6 +384,7 @@ var Vehicle = function(x, y) {
         vertex(0, -this.r * 2);
         vertex(-this.r, this.r * 2);
         vertex(this.r, this.r * 2);
+        ellipse(this.x, this.y, 8, 8);
         endShape(CLOSE);
         ellipse(this.x, this.y, 8, 8);
         pop();

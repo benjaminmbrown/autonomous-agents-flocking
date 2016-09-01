@@ -1,6 +1,8 @@
 # autonomous-agents-flocking
 Flocking with autonomous agents.
 
+#improving cohesion and separation
+<img src="https://media.giphy.com/media/3oz8xvshs2odTEl96M/giphy.gif"/>
 #flocking with more focused 'cone' of vision 
 <img src="https://media.giphy.com/media/l2SpRfoTxpAm9zLBm/giphy.gif"/>
 #proper alignment function
