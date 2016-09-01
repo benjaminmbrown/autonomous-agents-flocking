@@ -24,10 +24,10 @@ var Vehicle = function(x, y, maxSpeed, maxForce, width, height) {
         var alignForce = this.align(vehicles);
          var cohesionForce = this.cohesion(vehicles);
 
-        separationForce.mult(slider1.value());
-        seekForce.mult(slider2.value());
-        alignForce.mult(slider3.value());
-       cohesionForce.mult(slider4.value());
+        separationForce.mult(1.5);
+        //seekForce.mult(slider2.value());
+        alignForce.mult(1.0);
+       cohesionForce.mult(1.0);
 
         this.applyForce(separationForce);
         //this.applyForce(seekForce);
@@ -124,32 +124,37 @@ var Vehicle = function(x, y, maxSpeed, maxForce, width, height) {
     }
 
     this.separate = function(vehicles) {
-
+        var desiredSeparation = 20.0;
         var count = 0;
-        var sum = createVector();
+        var steer = createVector();
 
         for (var i = 0; i < vehicles.length; i++) {
             var distance = p5.Vector.dist(this.position, vehicles[i].position);
 
-            if (distance > 0 && distance < this.separationRadius) {
+            if ((distance > 0) && (distance < this.separationRadius)) {
                 var diff = p5.Vector.sub(this.position, vehicles[i].position);
                 diff.normalize();
                 diff.div(distance);
-                sum.add(diff);
+                steer.add(diff);
                 count++;
             }
 
         }
 
         if (count > 0) {
-            sum.div(count);
-            sum.normalize();
-            sum.mult(this.maxSpeed);
-            sum.sub(this.velocity);
-            sum.limit(this.maxForce);
+            steer.div(count);
+           
         }
 
-        return sum;
+        if(steer.mag()>0){
+            steer.normalize();
+            steer.mult(this.maxSpeed);
+            steer.sub(this.velocity);
+            steer.limit(this.maxForce);
+
+        }
+
+        return steer;
     }
 
     this.setAngle = function(vector, value) {
