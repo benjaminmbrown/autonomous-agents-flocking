@@ -1,5 +1,6 @@
 var vehicles = [];
 var flock;
+var debug ;
 
 function setup() {
 
@@ -7,10 +8,10 @@ function setup() {
     setFrameRate(50);
     flock = new Flock();
 
-    for (var i = 0; i < 20; i++) {
-        var v = new Vehicle(width/2, height/2);
-        flock.addVehicle(v);
-    }
+    // for (var i = 0; i < 30; i++) {
+    //     var v = new Vehicle(width/2, height/2);
+    //     flock.addVehicle(v);
+    // }
 }
 
 function draw() {
@@ -28,5 +29,5 @@ function keyPressed() {
         vehicles.push(new Vehicle(random(width), random(height), random(2, 5), random(0.2, 0.4), width, height));
         debug != debug;
     }
-    console.log(debug);
+
 }
