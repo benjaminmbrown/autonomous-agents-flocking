@@ -4,10 +4,10 @@ var flock;
 function setup() {
 
     createCanvas(820, 460);
-    setFrameRate(60);
+    setFrameRate(50);
     flock = new Flock();
 
-    for (var i = 0; i < 150; i++) {
+    for (var i = 0; i < 20; i++) {
         var v = new Vehicle(width/2, height/2);
         flock.addVehicle(v);
     }

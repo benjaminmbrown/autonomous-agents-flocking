@@ -5,7 +5,7 @@ var Vehicle = function(x, y) {
     this.position = createVector(x, y);
     this.r = 3;
     this.maxSpeed = 3;
-    this.maxForce = 0.011;
+    this.maxForce = 0.02;
     this.mass = 155;
 
     this.wanderRadius = 19;
@@ -17,7 +17,7 @@ var Vehicle = function(x, y) {
 
     var c = color(0, 0, random(x, y));
 
-     this.run = function(vehicles) {
+    this.run = function(vehicles) {
         this.flock(vehicles);
         this.update();
         this.borders();
@@ -33,12 +33,12 @@ var Vehicle = function(x, y) {
         var cohesionForce = this.cohesion(vehicles);
 
         separationForce.mult(2.5);
-        //seekForce.mult(slider2.value());
+        seekForce.mult(0.5);
         alignForce.mult(1.0);
         cohesionForce.mult(1.0);
 
         this.applyForce(separationForce);
-        //this.applyForce(seekForce);
+        this.applyForce(seekForce);
         this.applyForce(alignForce);
         this.applyForce(cohesionForce);
 
@@ -48,26 +48,30 @@ var Vehicle = function(x, y) {
         var sep = this.separate(vehicles); // Separation
         var ali = this.align(vehicles); // Alignment
         var coh = this.cohesion(vehicles); // Cohesion
+        var seekForce = this.seek(createVector(mouseX, mouseY));
         // Arbitrarily weight these forces
-        sep.mult(1.0);
+        sep.mult(1.25);
         ali.mult(1.5);
         coh.mult(1.0);
+        seekForce.mult(0.5);
+
         // Add the force vectors to acceleration
         this.applyForce(sep);
         this.applyForce(ali);
         this.applyForce(coh);
+      //  this.applyForce(seekForce);
 
     }
 
     this.cohesion = function(vehicles) {
 
-        var neighborDistance = 50;
-        var sum = createVector(0,0);
+        var neighborDistance = 250;
+        var sum = createVector(0, 0);
         var count = 0;
 
         for (var i = 0; i < vehicles.length; i++) {
             var distance = p5.Vector.dist(this.position, vehicles[i].position);
-            if ((distance > 0) && (distance < neighborDistance)) {
+            if ((distance > 10) && (distance < neighborDistance)&& (this.isTargetVisible(vehicles[i]))) {
                 sum.add(vehicles[i].position);
                 count++;
             }
@@ -82,18 +86,33 @@ var Vehicle = function(x, y) {
 
     }
 
+    this.isTargetVisible = function(target) {
+        //takes the position of this, and builds a cone of vision
+        //returns true if target is in cone of vision
+        //false if otherwise.
+
+         var angle = p5.Vector.angleBetween(this.velocity, target.velocity);
+         
+         if(degrees(angle)>10){
+            return true
+         }else {
+            return false;
+        }
+
+    }
+
     this.align = function(vehicles) {
         var visionRadius = 30;
-        var sum = createVector(0,0);
+        var sum = createVector(0, 0);
         var count = 0;
+        var visionDepth = 100 // how far ahed to look
+        var visionDegrees = 45 //degrees of vision
 
-
-        //only look at peers in cone of
 
         for (var i = 0; i < vehicles.length; i++) {
             var distance = p5.Vector.dist(this.position, vehicles[i].position);
 
-            if ((distance > 0) && (distance < visionRadius)) {
+            if ((distance > 5) && (distance < visionRadius) && (this.isTargetVisible(vehicles[i]))) {
                 sum.add(vehicles[i].velocity);
                 count++;
             }
@@ -103,6 +122,7 @@ var Vehicle = function(x, y) {
             sum.div(count);
             sum.normalize();
             sum.mult(this.maxSpeed);
+
             return this.steerTo(sum);
         } else {
             return createVector(0, 0);
@@ -120,12 +140,12 @@ var Vehicle = function(x, y) {
     this.separate = function(vehicles) {
         var desiredSeparation = 55.0;
         var count = 0;
-        var steer = createVector(0,0);
+        var steer = createVector(0, 0);
 
         for (var i = 0; i < vehicles.length; i++) {
             var distance = p5.Vector.dist(this.position, vehicles[i].position);
 
-            if ((distance > 0) && (distance < desiredSeparation)) {
+            if ((distance > 0) && (distance < desiredSeparation)&& (this.isTargetVisible(vehicles[i]))) {
                 //vector pointing away from neighbor
                 var diff = p5.Vector.sub(this.position, vehicles[i].position);
                 diff.normalize();
@@ -149,7 +169,7 @@ var Vehicle = function(x, y) {
         return steer;
     }
 
-     this.followFlow = function(flowfield) {
+    this.followFlow = function(flowfield) {
         var desired = flowfield.lookup(this.position);
         desired.mult(this.maxSpeed);
         this.applyForce(this.steerTo(desired));
@@ -161,7 +181,6 @@ var Vehicle = function(x, y) {
         if (this.position.x > width + this.r) this.position.x = -this.r;
         if (this.position.y > height + this.r) this.position.y = -this.r;
     }
-
 
     this.steerTo = function(desired) {
         var steer = p5.Vector.sub(desired, this.velocity);
@@ -236,7 +255,7 @@ var Vehicle = function(x, y) {
     }
 
     this.followPath = function(p) {
-        console.log(p);
+
 
         var predict = this.velocity.copy();
         predict.normalize();
