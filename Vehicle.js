@@ -1,11 +1,11 @@
-var Vehicle = function(x, y, maxSpeed, maxForce, width, height) {
+var Vehicle = function(x, y) {
     this.acceleration = createVector(0, 0);
     //this.velocity = createVector(0, -2);
-    this.velocity = createVector(random(-1,1),random(-1,1));
+    this.velocity = createVector(random(-1, 1), random(-1, 1));
     this.position = createVector(x, y);
-    this.r = 6;
-    this.maxSpeed = maxSpeed || 3;
-    this.maxForce = maxForce || 0.1;
+    this.r = 3;
+    this.maxSpeed = 3;
+    this.maxForce = 0.01;
     this.mass = 155;
 
     this.wanderRadius = 19;
@@ -17,17 +17,25 @@ var Vehicle = function(x, y, maxSpeed, maxForce, width, height) {
 
     var c = color(0, 0, random(x, y));
 
+     this.run = function(vehicles) {
+        this.flock(vehicles);
+        this.update();
+        this.borders();
+        this.display();
+    }
+
+
     this.manageBehaviors = function(vehicles) {
 
         var separationForce = this.separate(vehicles);
         var seekForce = this.seek(createVector(mouseX, mouseY));
         var alignForce = this.align(vehicles);
-         var cohesionForce = this.cohesion(vehicles);
+        var cohesionForce = this.cohesion(vehicles);
 
-        separationForce.mult(1.5);
+        separationForce.mult(2.5);
         //seekForce.mult(slider2.value());
         alignForce.mult(1.0);
-       cohesionForce.mult(1.0);
+        cohesionForce.mult(1.0);
 
         this.applyForce(separationForce);
         //this.applyForce(seekForce);
@@ -36,68 +44,53 @@ var Vehicle = function(x, y, maxSpeed, maxForce, width, height) {
 
     }
 
-    this.cohesion = function(vehicles){
-        console.log("cohse");
+    this.flock = function(vehicles) {
+        var sep = this.separate(vehicles); // Separation
+        var ali = this.align(vehicles); // Alignment
+        var coh = this.cohesion(vehicles); // Cohesion
+        // Arbitrarily weight these forces
+        sep.mult(1.3);
+        ali.mult(1.5);
+        coh.mult(1.0);
+        // Add the force vectors to acceleration
+        this.applyForce(sep);
+        this.applyForce(ali);
+        this.applyForce(coh);
+
+    }
+
+    this.cohesion = function(vehicles) {
+
         var neighborDistance = 50;
-        var sum = createVector();
+        var sum = createVector(0,0);
         var count = 0;
 
-        for(var i = 0; i < vehicles.length; i++){
+        for (var i = 0; i < vehicles.length; i++) {
             var distance = p5.Vector.dist(this.position, vehicles[i].position);
-            if((distance > 0) && (distance < neighborDistance)){
+            if ((distance > 0) && (distance < neighborDistance)) {
                 sum.add(vehicles[i].position);
                 count++;
             }
         }
 
-        if(count > 0){
+        if (count > 0) {
             sum.div(count);
             return this.seek(sum);
-        }else{
-            return createVector(0,0);
+        } else {
+            return createVector(0, 0);
         }
 
     }
 
-    this.run = function(vehicles) {
-        this.manageBehaviors(vehicles);
-        this.update();
-        this.borders();
-        this.display();
-    }
-
-    this.borders = function() {
-        if (this.position.x < -this.r) this.position.x = width + this.r;
-        if (this.position.y < -this.r) this.position.y = height + this.r;
-        if (this.position.x > width + this.r) this.position.x = -this.r;
-        if (this.position.y > height + this.r) this.position.y = -this.r;
-    }
-
-
-    this.followFlow = function(flowfield) {
-        var desired = flowfield.lookup(this.position);
-        desired.mult(this.maxSpeed);
-
-
-        this.applyForce(this.steerTo(desired));
-
-    }
-
-    this.steerTo = function(desired) {
-        var steer = p5.Vector.sub(desired, this.velocity);
-        steer.limit(this.maxForce);
-        return steer;
-    }
-
     this.align = function(vehicles) {
-        var visionRadius = 20;
-        var sum = createVector();
+        var visionRadius = 50;
+        var sum = createVector(0,0);
         var count = 0;
 
         for (var i = 0; i < vehicles.legth; i++) {
             var distance = p5.Vector.dist(this.position, vehicles[i].position);
 
-            if (distance > 0 && distance < visionRadius) {
+            if ((distance > 0) && (distance < visionRadius)) {
                 sum.add(vehicles[i].velocity);
                 count++;
             }
@@ -107,9 +100,8 @@ var Vehicle = function(x, y, maxSpeed, maxForce, width, height) {
             sum.div(count);
             sum.normalize();
             sum.mult(this.maxSpeed);
-            var steer = p5.Vector.sub(sum, this.velocity);
-            steer.limit(maxForce);
-            return steer;
+            console.log("aligning", sub);
+            return this.steerTo(sum);
         } else {
             return createVector(0, 0);
         }
@@ -124,36 +116,54 @@ var Vehicle = function(x, y, maxSpeed, maxForce, width, height) {
     }
 
     this.separate = function(vehicles) {
-        var desiredSeparation = 20.0;
+        var desiredSeparation = 25.0;
         var count = 0;
-        var steer = createVector();
+        var steer = createVector(0,0);
 
         for (var i = 0; i < vehicles.length; i++) {
             var distance = p5.Vector.dist(this.position, vehicles[i].position);
 
-            if ((distance > 0) && (distance < this.separationRadius)) {
+            if ((distance > 0) && (distance < desiredSeparation)) {
+                //vector pointing away from neighbor
                 var diff = p5.Vector.sub(this.position, vehicles[i].position);
                 diff.normalize();
                 diff.div(distance);
                 steer.add(diff);
                 count++;
             }
-
         }
 
         if (count > 0) {
             steer.div(count);
-           
         }
 
-        if(steer.mag()>0){
+        if (steer.mag() > 0) {
             steer.normalize();
             steer.mult(this.maxSpeed);
             steer.sub(this.velocity);
             steer.limit(this.maxForce);
-
         }
 
+        return steer;
+    }
+
+     this.followFlow = function(flowfield) {
+        var desired = flowfield.lookup(this.position);
+        desired.mult(this.maxSpeed);
+        this.applyForce(this.steerTo(desired));
+    }
+
+    this.borders = function() {
+        if (this.position.x < -this.r) this.position.x = width + this.r;
+        if (this.position.y < -this.r) this.position.y = height + this.r;
+        if (this.position.x > width + this.r) this.position.x = -this.r;
+        if (this.position.y > height + this.r) this.position.y = -this.r;
+    }
+
+
+    this.steerTo = function(desired) {
+        var steer = p5.Vector.sub(desired, this.velocity);
+        steer.limit(this.maxForce);
         return steer;
     }
 
