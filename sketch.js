@@ -17,7 +17,10 @@ function setup() {
     flowfield = new Flowfield(20);
     //path = new Path(width, height);
     //newPath();
-
+    for (var i = 0; i < 60; i++) {
+        var v = new Vehicle(width / 2, height / 2);
+        flock.addVehicle(v);
+    }
 
 
     slider1 = createSlider(0, 8, 4);
@@ -37,7 +40,7 @@ function draw() {
 function keyPressed() {
 
     for (var i = 0; i < key; i++) {
-         flock.addVehicle(new Vehicle(random(width), random(height), random(2, 3), random(0.02, 0.02), width, height));
+        flock.addVehicle(new Vehicle(random(width), random(height), random(2, 3), random(0.02, 0.02), width, height));
     }
     if (key == 'K') {
         console.log("pressed");

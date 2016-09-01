@@ -1,6 +1,7 @@
 var Vehicle = function(x, y, maxSpeed, maxForce, width, height) {
     this.acceleration = createVector(0, 0);
-    this.velocity = createVector(0, -2);
+    //this.velocity = createVector(0, -2);
+    this.velocity = createVector(random(-1,1),random(-1,1));
     this.position = createVector(x, y);
     this.r = 6;
     this.maxSpeed = maxSpeed || 3;
@@ -12,7 +13,7 @@ var Vehicle = function(x, y, maxSpeed, maxForce, width, height) {
     this.wanderCenter = 0;
     this.wanderAngle = 0;
     this.wanderForce = createVector();
-    this.separationRadius = slider3.value();
+    this.separationRadius = 40;
 
     var c = color(0, 0, random(x, y));
 
@@ -21,17 +22,40 @@ var Vehicle = function(x, y, maxSpeed, maxForce, width, height) {
         var separationForce = this.separate(vehicles);
         var seekForce = this.seek(createVector(mouseX, mouseY));
         var alignForce = this.align(vehicles);
-       // var cohesionForce = this.cohesion(vehicles);
+         var cohesionForce = this.cohesion(vehicles);
 
         separationForce.mult(slider1.value());
         seekForce.mult(slider2.value());
         alignForce.mult(slider3.value());
-       // cohesionForce.mult(slider4.value());
+       cohesionForce.mult(slider4.value());
 
         this.applyForce(separationForce);
-        this.applyForce(seekForce);
+        //this.applyForce(seekForce);
         this.applyForce(alignForce);
-        //this.applyForce(cohesionForce);
+        this.applyForce(cohesionForce);
+
+    }
+
+    this.cohesion = function(vehicles){
+        console.log("cohse");
+        var neighborDistance = 50;
+        var sum = createVector();
+        var count = 0;
+
+        for(var i = 0; i < vehicles.length; i++){
+            var distance = p5.Vector.dist(this.position, vehicles[i].position);
+            if((distance > 0) && (distance < neighborDistance)){
+                sum.add(vehicles[i].position);
+                count++;
+            }
+        }
+
+        if(count > 0){
+            sum.div(count);
+            return this.seek(sum);
+        }else{
+            return createVector(0,0);
+        }
 
     }
 
