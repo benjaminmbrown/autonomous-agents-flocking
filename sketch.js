@@ -7,7 +7,7 @@ function setup() {
     setFrameRate(60);
     flock = new Flock();
 
-    for (var i = 0; i < 60; i++) {
+    for (var i = 0; i < 150; i++) {
         var v = new Vehicle(width/2, height/2);
         flock.addVehicle(v);
     }

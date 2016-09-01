@@ -5,7 +5,7 @@ var Vehicle = function(x, y) {
     this.position = createVector(x, y);
     this.r = 3;
     this.maxSpeed = 3;
-    this.maxForce = 0.01;
+    this.maxForce = 0.011;
     this.mass = 155;
 
     this.wanderRadius = 19;
@@ -49,7 +49,7 @@ var Vehicle = function(x, y) {
         var ali = this.align(vehicles); // Alignment
         var coh = this.cohesion(vehicles); // Cohesion
         // Arbitrarily weight these forces
-        sep.mult(1.3);
+        sep.mult(1.0);
         ali.mult(1.5);
         coh.mult(1.0);
         // Add the force vectors to acceleration
@@ -83,11 +83,14 @@ var Vehicle = function(x, y) {
     }
 
     this.align = function(vehicles) {
-        var visionRadius = 50;
+        var visionRadius = 30;
         var sum = createVector(0,0);
         var count = 0;
 
-        for (var i = 0; i < vehicles.legth; i++) {
+
+        //only look at peers in cone of
+
+        for (var i = 0; i < vehicles.length; i++) {
             var distance = p5.Vector.dist(this.position, vehicles[i].position);
 
             if ((distance > 0) && (distance < visionRadius)) {
@@ -100,7 +103,6 @@ var Vehicle = function(x, y) {
             sum.div(count);
             sum.normalize();
             sum.mult(this.maxSpeed);
-            console.log("aligning", sub);
             return this.steerTo(sum);
         } else {
             return createVector(0, 0);
@@ -116,7 +118,7 @@ var Vehicle = function(x, y) {
     }
 
     this.separate = function(vehicles) {
-        var desiredSeparation = 25.0;
+        var desiredSeparation = 55.0;
         var count = 0;
         var steer = createVector(0,0);
 
