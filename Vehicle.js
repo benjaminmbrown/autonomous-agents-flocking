@@ -1,19 +1,22 @@
-var Vehicle = function(x, y) {
+var Vehicle = function(x, y, Type) {
     this.acceleration = createVector(0, 0);
     this.velocity = createVector(random(-1, 1), random(-1, 1));
     this.position = createVector(x, y);
     this.r = 3;
-    this.minSpeed=1;
-    this.maxSpeed = 5;
-    this.minForce=0.01;
-    this.maxForce = 0.02;
+    this.minSpeed = 1;
+    this.maxSpeed = 8;
+    this.minForce = 0.01;
+    this.maxForce = 0.015;
     this.mass = 155;
+
+    this.type = Type || 2;
 
     this.wanderRadius = 19;
     this.wanderDistance = 4;
     this.wanderCenter = 0;
     this.wanderAngle = 0;
     this.wanderForce = createVector();
+    this.life = 255;
 
 
 
@@ -24,35 +27,51 @@ var Vehicle = function(x, y) {
     this.visionDepth = 80
     this.visionDegrees = random(10, 90); //width of cone of vision
 
-console.log(this.visionDepth);
-    var c = color(0, 0, random(x, y));
+    this.c = color(0, 0, 255, 10);
+
+    if (this.type == 2) {
+        this.c = color(255, 0, 0, 20);
+    }
 
     this.run = function(vehicles) {
         this.flock(vehicles);
+        
         this.update();
         this.borders();
         this.display();
     }
 
 
-    
+
     this.flock = function(vehicles) {
         var sep = this.separate(vehicles); // Separation
         var ali = this.align(vehicles); // Alignment
         var coh = this.cohesion(vehicles); // Cohesion
         var seekForce = this.seek(createVector(mouseX, mouseY));
+        var avoidForce = this.flee(createVector(mouseX, mouseY));
         // Arbitrarily weight these forces
-        sep.mult(1.5);
+        sep.mult(1.6);
         ali.mult(1.0);
-        coh.mult(1.2);
+        coh.mult(1.0);
         seekForce.mult(0.1);
+        avoidForce.mult();
 
         // Add the force vectors to acceleration
-         this.applyForce(ali);
-         this.applyForce(coh);
+
+        this.applyForce(ali);
+        this.applyForce(coh);
         this.applyForce(sep);
-        
-          this.applyForce(seekForce);
+
+        //this.applyForce(seekForce);
+        this.applyForce(avoidForce);
+
+    }
+
+    this.reduceLife = function(damage) {
+        this.life = this.life - damage;
+    }
+
+    this.addLife = function(health) {
 
     }
 
@@ -98,7 +117,7 @@ console.log(this.visionDepth);
         for (var i = 0; i < vehicles.length; i++) {
             var distance = p5.Vector.dist(this.position, vehicles[i].position);
 
-            if ((distance > 0)&& (distance < this.alignDistance) && (this.isTargetVisible(vehicles[i]))) {
+            if ((distance > 0) && (distance < this.alignDistance) && (this.isTargetVisible(vehicles[i]))) {
                 sum.add(vehicles[i].velocity);
                 count++;
             }
@@ -108,7 +127,7 @@ console.log(this.visionDepth);
             sum.div(count);
             sum.normalize();
             sum.mult(this.maxSpeed);
-         
+
             return this.steerTo(sum);
         } else {
             return createVector(0, 0);
@@ -151,13 +170,14 @@ console.log(this.visionDepth);
             steer.mult(this.maxSpeed);
             steer.sub(this.velocity);
             steer.limit(this.maxForce);
-         
+
         }
 
         return steer;
     }
 
     this.followFlow = function(flowfield) {
+        
         var desired = flowfield.lookup(this.position);
         desired.mult(this.maxSpeed);
         this.applyForce(this.steerTo(desired));
@@ -346,7 +366,10 @@ console.log(this.visionDepth);
         }
     };
 
+
+
     this.update = function() {
+
         this.velocity.add(this.acceleration);
         this.velocity.limit(this.maxSpeed);
         this.position.add(this.velocity);
@@ -361,38 +384,33 @@ console.log(this.visionDepth);
     this.display = function() {
         var theta = this.velocity.heading() + PI / 2;
 
-        // fill(color(255, 0, 0, 30));
-        // stroke(color(255, 0, 0, 100));
+        //fill(color(255, 0, 0, 30));
+        //stroke(color(255, 0, 0, 100));
         // ellipse(this.position.x, this.position.y, this.desiredSeparation, this.desiredSeparation);
 
-        // //alignment
-        // fill(color(0, 255, 0, 20));
-        // stroke(color(0, 255, 0, 100));
+        // // //alignment
+        // fill(color(255, 0 ,255, 10));
+        // noStroke();
         // ellipse(this.position.x, this.position.y, this.alignDistance, this.alignDistance);
 
-        //cohesion
-        fill(color(0, 0, 255, 20));
+        // //cohesion
+        fill(this.c);
         noStroke();
-       // stroke(color(0, 0, 255, 100));
-        ellipse(this.position.x, this.position.y, this.cohesionDistance, this.cohesionDistance);
-
-        //   fill(color(0,255, 0, 20));
-        // noStroke();
-        // ellipse(this.position.x, this.position.y, this.visionDepth, this.visionDepth);
+        ellipse(this.position.x, this.position.y, this.cohesionDistance/2, this.cohesionDistance/2);
 
 
-        // fill(c);
-        // stroke(200);
-        // strokeWeight(1);
-        // push();
-        // translate(this.position.x, this.position.y);
-        // rotate(theta);
-        // beginShape();
-        // vertex(0, -this.r * 2);
-        // vertex(-this.r, this.r * 2);
-        // vertex(this.r, this.r * 2);
-        // endShape(CLOSE);
-        //     ellipse(this.position.x,this.position.y,10,10);
+
+        fill(this.c);
+        stroke(200);
+        strokeWeight(1);
+        push();
+        translate(this.position.x, this.position.y);
+        rotate(theta);
+        beginShape();
+        vertex(0, -this.r * 2);
+        vertex(-this.r, this.r * 2);
+        vertex(this.r, this.r * 2);
+        endShape(CLOSE);
         pop();
         //separation field
 

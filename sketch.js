@@ -1,33 +1,45 @@
 var vehicles = [];
 var flock;
+var predators =[];
 var debug ;
+var flowField;
 
 function setup() {
 
-    createCanvas(1020, 680);
+    createCanvas(650, 450);
     setFrameRate(50);
     flock = new Flock();
+    predators = new Flock();
+    flowField = new Flowfield(25);
+    flowField.init();
 
-    // for (var i = 0; i < 30; i++) {
-    //     var v = new Vehicle(width/2, height/2);
-    //     flock.addVehicle(v);
-    // }
+    var type= 1;
+   
+    for (var i = 0; i < 30; i++) {
+        var v = new Vehicle(width/2, height/2, type);
+        flock.addVehicle(v);
+    }
+    flock.addFlowfield(flowField);
 }
 
 function draw() {
     background(255);
     flock.run();
+    predators.run();
+
+    flowField.display()
+}
+
+function mouseDragged(){
+    flock.addVehicle(new Vehicle(mouseX, mouseY,1));
 }
 
 function keyPressed() {
 
     for (var i = 0; i < key; i++) {
-        flock.addVehicle(new Vehicle(random(width), random(height), random(2, 3), random(0.02, 0.02), width, height));
+        predators.addVehicle(new Vehicle(width/2, height/2));
     }
-    if (key == 'K') {
-        console.log("pressed");
-        vehicles.push(new Vehicle(random(width), random(height), random(2, 5), random(0.2, 0.4), width, height));
-        debug != debug;
-    }
+
+ 
 
 }

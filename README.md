@@ -1,5 +1,8 @@
 # autonomous-agents-flocking
 Flocking with autonomous agents.
+
+#multiple flock types plus add by mouse track
+<img src="https://media.giphy.com/media/l2SpVc2msz00XjY1W/giphy.gif"/>
 #nebulous object with alpha and flocking
 <img src="https://media.giphy.com/media/3o7TKTj74tbHq3lCg0/giphy.gif"/>
 #improving cohesion and separation
