@@ -1,5 +1,6 @@
 # autonomous-agents-flocking
 Flocking with autonomous agents.
+#<a href="https://s3.amazonaws.com/autonomous-agents/index.html">Live Demo - drag mouse or push a number to add agents</a>
 
 #multiple flock types plus add by mouse track
 <img src="https://media.giphy.com/media/l2SpVc2msz00XjY1W/giphy.gif"/>

@@ -400,18 +400,18 @@ var Vehicle = function(x, y, Type) {
 
 
 
-        fill(this.c);
-        stroke(200);
-        strokeWeight(1);
-        push();
-        translate(this.position.x, this.position.y);
-        rotate(theta);
-        beginShape();
-        vertex(0, -this.r * 2);
-        vertex(-this.r, this.r * 2);
-        vertex(this.r, this.r * 2);
-        endShape(CLOSE);
-        pop();
+        // fill(this.c);
+        // stroke(200);
+        // strokeWeight(1);
+        // push();
+        // translate(this.position.x, this.position.y);
+        // rotate(theta);
+        // beginShape();
+        // vertex(0, -this.r * 2);
+        // vertex(-this.r, this.r * 2);
+        // vertex(this.r, this.r * 2);
+        // endShape(CLOSE);
+        // pop();
         //separation field
 
 
